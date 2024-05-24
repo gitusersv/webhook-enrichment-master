@@ -1,0 +1,35 @@
+
+{
+  "expansions": [
+    {
+      "expanded_terms": [
+        "car",
+        "automobile",
+        "sedan",
+        "suv",
+        "vehicle"
+      ]
+    },
+    {
+      "input_terms": [
+        "weekday"
+      ],
+      "expanded_terms": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday"
+      ]
+    },
+    {
+      "input_terms": [
+        "weekend"
+      ],
+      "expanded_terms": [
+        "saturday",
+        "sunday"
+      ]
+    }
+  ]
+}
