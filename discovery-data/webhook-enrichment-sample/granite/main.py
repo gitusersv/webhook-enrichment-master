@@ -141,7 +141,7 @@ def enrich(doc):
             for entity in results:
                 entity_text = entity['text']
                 entity_type = entity['type']
-                for matched in re.finditer(re.escape(entity_text), text):
+                for matched in re.finditer(entity_text, text):
                     features_to_send.append(
                         {
                             'type': 'annotation',
