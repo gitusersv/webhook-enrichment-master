@@ -41,36 +41,62 @@ def extract_entities(text):
     # Prompt
     payload = {
         'model_id': 'mistralai/mixtral-8x7b-instruct-v01',
-        'input': f'''[INST]You are a doctor who classifies a patient record in Finnish into one or more of 4 categories based on the International Classification of Functioning, Disability and Health (ICF) codes and labels in Finnish: 
-D450: Käveleminen
-D850: Vastikkeellinen työ
-E1101: Lääkkeet
-B280: Kipuaistimus
-Return all the applicable codes and labels. If multiple codes apply, return all codes and labels. Do not make up new codes or labels. If the patient record does not belong to any category, return null. Return the output in key value pairs.
+        'input': f'''[INST]ou are a doctor who classifies passages from a patient record in Finnish into one or more of 10 categories based on the International Classification of Functioning, Disability and Health (ICF) codes and labels in Finnish. You must classify using the following child codes of B280:  Kipuaistimus ('Pain'):
+B28010: Kipu päässä ja niskassa
+B28011: Kipu rinnassa
+B28012: Kipu mahassa tai vatsassa
+B28013: Kipu selässä
+B28014: Kipu yläraajassa
+B28015: Kipu alaraajassa
+B28016: Kipu nivelissä
+B28018: Kipu ruumiin/kehon osassa, muu määritelty
+B28019: Kipu ruumiin/kehon osassa, määrittelemätön
+B2804: Alueellisesti säteilevä kipu
+
+Follow these rules:
+1) Return all the applicable codes and the word, words or phrases that serve as evidence for the code. Always include the word that describes the pain. 
+2) If evidence exists for the same code multiple times, return the code multiple times paired with each word or phrase evidence. Return the shortest possible evidence.
+3) Do not make up new codes.
+4) Re-write the evidence phrase to be more readable, and return only grammatically correct Finnish.
+5) Return codes B2810 - B2810 with the name of the body part only if pain in that specific body part is mentioned.
+6) Return B28010 only when pain is in head or neck. 
+7) Return B28011 only when pain is in the chest. 
+8) Return B28012 only when pain is in the stomach.
+9) Return B28013 when pain is in the back or spine.
+10) Return B28014 when pain is in an upper limb, arm, hand, wrist, elbow, shoulder etc.
+11) Return B28015 when pain is in a lower limb, leg, foott, calf, thigh etc.
+12) Return B28016 when pain is in a joint.
+13) Return code B28018 if pain in multiple body parts are mentioned.
+14) Return code B28019 only if pain is mentioned but not the body part.
+15) Return code B2804 for radiating pain.
+16) If the patient record does not belong to any category, return null.
+17) Return the output as a comma separated list of ICF code paired with each words or phrase that serves as evidence of the code. 
+18) Do not add a full stop at the end of the output
 
 Examples: 
-Input: Yleistila heikentynyt unenpuutteen vuoksi. 
+Input: Tulosyy: Selkäkipu. Anamneesi: 42-vuotias nainen, sairaanhoitaja. Ei tunnettuja perussairauksia. Työskentelee sairaalassa, jossa joutuu usein nostamaan ja kääntämään raskaita potilaita. Kaksi viikkoa sitten nosti painavaa potilasta, jolloin tunsi äkillisen kivun alaselässä. Kipua myös niskassa ja yläraajoissa. Kipu pahenee erityisesti työpäivän jälkeen. Kotona liikkuminen hankalaa kivun vuoksi, erityisesti portaiden nouseminen ja istuma-asennosta nouseminen. Kipua lievittää lepo, mutta kipu palaa nopeasti rasituksen myötä. VAS-asteikolla kipu 6/10. Ei virtsaamisvaikeuksia, ei säteilyoireita, ei puutumista. Status: Yleistila hyvä. Nousee tuolista varovaisesti, kävelee hitaasti ja varovasti. Selän taivutukset rajoittuneet, ilmoittaa kivun keskittyvän alaselkään ja yläraajoihin. Etenkin taivutus eteenpäin provosoi kipua. Alaraajoissa lihasvoimat symmetriset, kyykkyyn ja ylös pääsee vaivoin. Nilkkojen voimat täydet, ei tuntopuutoksia, refleksit normaalit. Suunnitelma: Todennäköisesti lihasperäinen selkäkipu ja ylirasitus. Neuvotaan vastaanotolla venyttely- ja lihasharjoitukset. Kannustetaan liikkumaan mahdollisuuksien mukaan normaalisti. Suositellaan tulehduskipulääkettä, kuten ibuprofeenia tarvittaessa. Lämpöhoitoa voi kokeilla paikallisesti kivun lievittämiseksi. Jos oireet eivät ala helpottaa kahden viikon sisään, suositellaan varaamaan aika fysioterapeutille. Diagnoosi (ICD-10): M54.5 Lanneselän kipu
 Output: 
-null 
+B28013: "selkäkipu", B28013: "alaselkäkipu", B28013: "kipu yltää välillä myös yläselkään", B28013: "kipua ilmoittaa alaselkään", B28013: "selän taivutus eteenpäin ja taaksepäin provosoi kivun", B28013: "lanneselän kipu" 
 
-Input: Kipu on nyt niin voimakasta, että se häiritsee unta ja tekee tavallisista päivittäisistä toiminnoista, kuten pukeutumisesta ja liikkumisesta, erittäin vaikeita. 
+Input: Tulosyy: Borrelioosin diagnosointi ja jatkuvat nivelkivut. Anamneesi: 14-vuotias poika. Aiemmin epäilty punkin purema ja pyöreä ihomerkki. Kaksi viikkoa sitten otetut verikokeet osoittivat borrelioosin. Nivelkivut jatkuvat samalla tasolla kuin edellisellä käynnillä. Huoli kyvystä osallistua koulun liikuntatunneille on kasvanut. Status: Yleistila hyvä. Nivelkivut edelleen läsnä, erityisesti aamuisin ja iltaisin. Kivut edelleen paikallisia, ei merkkiä hermoperäisestä särystä. Ihomerkki näkyy yhä, mutta ei tulehtunut. Psykologinen stressi näkyy huolena terveydentilasta ja osallistumisesta koulun toimintaan. Suunnitelma: Aloittaa välittömästi antibioottikuuri borrelioosin hoitoon. Seurataan kivun kehittymistä ja vasteita hoitoon. Jatketaan kevennettyä ohjelmaa koululiikunnassa ja tarjotaan psykologista tukea sopeutumisessa koulun sosiaaliseen elämään. Mikäli kivut eivät helpota hoidon aikana, harkitaan jatkotutkimuksia ja konsultaatiota lastenreumatologin kanssa. Diagnoosi (ICD-10): A69.2 Lyme tauti (borrelioosi)
 Output: 
-B280: "Kipuaistimus", D450: "Käveleminen"
+B28016: "nivelkivut", B28018: "kivut edelleen paikallisia", B2804: "hermoperäinen särky"
 
-Input: Kivunhoitosuunnitelmaa päivitetään sisältämään vahvempia kipulääkkeitä lyhytaikaiseen käyttöön, jotta unta ja päivittäistä toimintakykyä voidaan parantaa.
-Output: 
-E1101: "Lääkkeet" 
 
 Input: {text}[/INST] 
 Output:
 ''',
         'parameters': {
-            'decoding_method': 'greedy',
-            'max_new_tokens': 30,
+            'decoding_method': 'sample',
+            'max_new_tokens': 250,
             'min_new_tokens': 0,
+            'random_seed': 10,
             'stop_sequences': [
    "\n\n"
   ],
+            'temperature': 0.5,
+            'top_k': 35,
+            'top_p': 0.5,
             'repetition_penalty': 1
         },
         'wml_instance_crn': WML_INSTANCE_CRN
@@ -87,7 +113,8 @@ Output:
             return entities
         for pair in re.split(r',\s*', result):
             text_type = re.split(r':\s*', pair)
-            entities.append({'text': text_type[1], 'type': text_type[0]})
+            if len(text_type) == 2:
+                entities.append({'text': text_type[1], 'type': text_type[0]})
         return entities
     elif response.status_code == 401:
         # Token expired. Re-generate it.
