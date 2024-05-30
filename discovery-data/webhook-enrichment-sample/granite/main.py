@@ -76,11 +76,11 @@ Follow these rules:
 Examples: 
 Input: Tulosyy: Selkäkipu. Anamneesi: 42-vuotias nainen, sairaanhoitaja. Ei tunnettuja perussairauksia. Työskentelee sairaalassa, jossa joutuu usein nostamaan ja kääntämään raskaita potilaita. Kaksi viikkoa sitten nosti painavaa potilasta, jolloin tunsi äkillisen kivun alaselässä. Kipua myös niskassa ja yläraajoissa. Kipu pahenee erityisesti työpäivän jälkeen. Kotona liikkuminen hankalaa kivun vuoksi, erityisesti portaiden nouseminen ja istuma-asennosta nouseminen. Kipua lievittää lepo, mutta kipu palaa nopeasti rasituksen myötä. VAS-asteikolla kipu 6/10. Ei virtsaamisvaikeuksia, ei säteilyoireita, ei puutumista. Status: Yleistila hyvä. Nousee tuolista varovaisesti, kävelee hitaasti ja varovasti. Selän taivutukset rajoittuneet, ilmoittaa kivun keskittyvän alaselkään ja yläraajoihin. Etenkin taivutus eteenpäin provosoi kipua. Alaraajoissa lihasvoimat symmetriset, kyykkyyn ja ylös pääsee vaivoin. Nilkkojen voimat täydet, ei tuntopuutoksia, refleksit normaalit. Suunnitelma: Todennäköisesti lihasperäinen selkäkipu ja ylirasitus. Neuvotaan vastaanotolla venyttely- ja lihasharjoitukset. Kannustetaan liikkumaan mahdollisuuksien mukaan normaalisti. Suositellaan tulehduskipulääkettä, kuten ibuprofeenia tarvittaessa. Lämpöhoitoa voi kokeilla paikallisesti kivun lievittämiseksi. Jos oireet eivät ala helpottaa kahden viikon sisään, suositellaan varaamaan aika fysioterapeutille. Diagnoosi (ICD-10): M54.5 Lanneselän kipu
 Output: 
-B28013: "selkäkipu", B28013: "alaselkäkipu", B28013: "kipu yltää välillä myös yläselkään", B28013: "kipua ilmoittaa alaselkään", B28013: "selän taivutus eteenpäin ja taaksepäin provosoi kivun", B28013: "lanneselän kipu" 
+B28013: selkäkipu, B28013: alaselkäkipu, B28013: kipu yltää välillä myös yläselkään, B28013: kipua ilmoittaa alaselkään, B28013: selän taivutus eteenpäin ja taaksepäin provosoi kivun, B28013: lanneselän kipu
 
 Input: Tulosyy: Borrelioosin diagnosointi ja jatkuvat nivelkivut. Anamneesi: 14-vuotias poika. Aiemmin epäilty punkin purema ja pyöreä ihomerkki. Kaksi viikkoa sitten otetut verikokeet osoittivat borrelioosin. Nivelkivut jatkuvat samalla tasolla kuin edellisellä käynnillä. Huoli kyvystä osallistua koulun liikuntatunneille on kasvanut. Status: Yleistila hyvä. Nivelkivut edelleen läsnä, erityisesti aamuisin ja iltaisin. Kivut edelleen paikallisia, ei merkkiä hermoperäisestä särystä. Ihomerkki näkyy yhä, mutta ei tulehtunut. Psykologinen stressi näkyy huolena terveydentilasta ja osallistumisesta koulun toimintaan. Suunnitelma: Aloittaa välittömästi antibioottikuuri borrelioosin hoitoon. Seurataan kivun kehittymistä ja vasteita hoitoon. Jatketaan kevennettyä ohjelmaa koululiikunnassa ja tarjotaan psykologista tukea sopeutumisessa koulun sosiaaliseen elämään. Mikäli kivut eivät helpota hoidon aikana, harkitaan jatkotutkimuksia ja konsultaatiota lastenreumatologin kanssa. Diagnoosi (ICD-10): A69.2 Lyme tauti (borrelioosi)
 Output: 
-B28016: "nivelkivut", B28018: "kivut edelleen paikallisia", B2804: "hermoperäinen särky"
+B28016: nivelkivut, B28018: kivut edelleen paikallisia, B2804: hermoperäinen särky
 
 
 Input: {text}[/INST] 
@@ -141,7 +141,7 @@ def enrich(doc):
             for entity in results:
                 entity_text = entity['text']
                 entity_type = entity['type']
-                for matched in re.finditer(entity_text, text):
+                for matched in re.finditer(re.escape(entity_text), text):
                     features_to_send.append(
                         {
                             'type': 'annotation',
