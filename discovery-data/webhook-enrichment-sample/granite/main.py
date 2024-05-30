@@ -46,7 +46,7 @@ D450: Käveleminen
 D850: Vastikkeellinen työ
 E1101: Lääkkeet
 B280: Kipuaistimus
-Return all the applicable codes and labels. If multiple codes apply, return all codes and labels. Do not make up new codes or labels. If the patient record does not belong to any category, return null. 
+Return all the applicable codes and labels. If multiple codes apply, return all codes and labels. Do not make up new codes or labels. If the patient record does not belong to any category, return null. Return the output in key value pairs.
 
 Examples: 
 Input: Yleistila heikentynyt unenpuutteen vuoksi. 
@@ -55,12 +55,11 @@ null
 
 Input: Kipu on nyt niin voimakasta, että se häiritsee unta ja tekee tavallisista päivittäisistä toiminnoista, kuten pukeutumisesta ja liikkumisesta, erittäin vaikeita. 
 Output: 
-B280: Kipuaistimus 
-D450: Käveleminen
+B280: "Kipuaistimus", D450: "Käveleminen"
 
 Input: Kivunhoitosuunnitelmaa päivitetään sisältämään vahvempia kipulääkkeitä lyhytaikaiseen käyttöön, jotta unta ja päivittäistä toimintakykyä voidaan parantaa.
 Output: 
-E1101: Lääkkeet 
+E1101: "Lääkkeet" 
 
 Input: {text}[/INST] 
 Output:
@@ -88,7 +87,7 @@ Output:
             return entities
         for pair in re.split(r',\s*', result):
             text_type = re.split(r':\s*', pair)
-            entities.append({'text': text_type[0], 'type': text_type[1]})
+            entities.append({'text': text_type[1], 'type': text_type[0]})
         return entities
     elif response.status_code == 401:
         # Token expired. Re-generate it.
